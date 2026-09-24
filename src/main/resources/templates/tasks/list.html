@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Список задач</title>
+    <style>
+        table { border-collapse: collapse; width: 80%; margin: 20px auto; }
+        th, td { border: 1px solid #ccc; padding: 8px; text-align: left; }
+        th { background-color: #f2f2f2; }
+        h1 { text-align: center; }
+        .btn { display: inline-block; padding: 8px 16px; margin: 10px; background: #007bff; color: white; text-decoration: none; border-radius: 4px; }
+    </style>
+</head>
+<body>
+<h1>Задачи</h1>
+<div style="text-align: center;">
+    <a th:href="@{/tasks/new}" class="btn">Добавить задачу</a>
+</div>
+<table>
+    <thead>
+    <tr>
+        <th>ID</th>
+        <th>Название</th>
+        <th>Описание</th>
+        <th>Дата</th>
+        <th>Выполнено</th>
+    </tr>
+    </thead>
+    <tbody>
+    <tr th:each="task : ${tasks}">
+        <td th:text="${task.id}"></td>
+        <td th:text="${task.name}"></td>
+        <td th:text="${task.description}"></td>
+        <td th:text="${task.dueDate}"></td>
+        <td th:text="${task.completed} ? 'Да' : 'Нет'"></td>
+    </tr>
+    </tbody>
+</table>
+</body>
+</html>
