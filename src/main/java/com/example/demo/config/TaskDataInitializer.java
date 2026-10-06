@@ -17,9 +17,11 @@ public class TaskDataInitializer implements CommandLineRunner {
 
     @Override
     public void run(String... args) {
-        System.out.println("========== ТЕСТ JPA: добавление и извлечение задач ==========");
+        System.out.println("========== ТЕСТ JPA: проверка работы репозитория ==========");
 
-        // 1. Добавляем тестовые задачи
+        // ⚠️ Блок добавления закомментирован, чтобы не дублировать задачи при каждом запуске.
+        // Раскомментируйте ТОЛЬКО один раз, если нужно добавить тестовые задачи в пустую БД.
+        /*
         Task task1 = Task.builder()
                 .name("Тестовая задача 1 из JPA")
                 .description("Создана через Task.builder()")
@@ -36,10 +38,10 @@ public class TaskDataInitializer implements CommandLineRunner {
 
         taskRepository.save(task1);
         taskRepository.save(task2);
-
         System.out.println("✅ Добавлено 2 задачи через TaskRepository.save()");
+        */
 
-        // 2. Извлекаем все задачи
+        // Чтение данных — безопасно, не изменяет БД
         List<Task> allTasks = taskRepository.findAll();
         System.out.println("📋 Всего задач в БД: " + allTasks.size());
         for (Task t : allTasks) {
@@ -48,10 +50,13 @@ public class TaskDataInitializer implements CommandLineRunner {
                     + ", completed=" + t.getCompleted());
         }
 
-        // 3. Извлекаем одну задачу по ID
-        taskRepository.findById(task1.getId()).ifPresent(t ->
-                System.out.println("🔍 Найдена задача по ID: " + t.getName())
-        );
+        // Поиск одной задачи
+        if (!allTasks.isEmpty()) {
+            Long firstId = allTasks.get(0).getId();
+            taskRepository.findById(firstId).ifPresent(t ->
+                    System.out.println("🔍 Найдена задача по ID=" + firstId + ": " + t.getName())
+            );
+        }
 
         System.out.println("========== ТЕСТ JPA ЗАВЕРШЁН ==========");
     }
