@@ -19,10 +19,7 @@
             -webkit-font-smoothing: antialiased;
         }
 
-        .container {
-            max-width: 960px;
-            margin: 0 auto;
-        }
+        .container { max-width: 1000px; margin: 0 auto; }
 
         .header {
             display: flex;
@@ -45,10 +42,7 @@
             margin-top: 4px;
         }
 
-        .actions {
-            display: flex;
-            gap: 10px;
-        }
+        .actions { display: flex; gap: 10px; flex-wrap: wrap; }
 
         .btn {
             display: inline-flex;
@@ -65,26 +59,46 @@
             cursor: pointer;
         }
 
-        .btn-primary {
-            background: #111;
-            color: #fff;
-        }
-
-        .btn-primary:hover {
-            background: #000;
-            transform: translateY(-1px);
-        }
+        .btn-primary { background: #111; color: #fff; }
+        .btn-primary:hover { background: #000; transform: translateY(-1px); }
 
         .btn-ghost {
             background: transparent;
             color: #6b7280;
             border: 1px solid #e5e7eb;
         }
+        .btn-ghost:hover { color: #111; border-color: #111; }
 
-        .btn-ghost:hover {
-            color: #111;
-            border-color: #111;
+        .filter-form {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+            background: #fff;
+            padding: 16px 20px;
+            border: 1px solid #ececec;
+            border-radius: 12px;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
         }
+
+        .filter-form label {
+            font-size: 14px;
+            color: #6b7280;
+            font-weight: 500;
+        }
+
+        .filter-form select {
+            font-family: inherit;
+            font-size: 14px;
+            padding: 8px 12px;
+            border: 1px solid #e5e7eb;
+            border-radius: 8px;
+            background: #fff;
+            cursor: pointer;
+            outline: none;
+        }
+
+        .filter-form select:focus { border-color: #6366f1; }
 
         .card {
             background: #fff;
@@ -93,10 +107,7 @@
             overflow: hidden;
         }
 
-        table {
-            width: 100%;
-            border-collapse: collapse;
-        }
+        table { width: 100%; border-collapse: collapse; }
 
         thead th {
             text-align: left;
@@ -118,17 +129,9 @@
             vertical-align: middle;
         }
 
-        tbody tr:last-child td {
-            border-bottom: none;
-        }
-
-        tbody tr {
-            transition: background 0.12s ease;
-        }
-
-        tbody tr:hover {
-            background: #fafafa;
-        }
+        tbody tr:last-child td { border-bottom: none; }
+        tbody tr { transition: background 0.12s ease; }
+        tbody tr:hover { background: #fafafa; }
 
         .id-cell {
             color: #9ca3af;
@@ -137,14 +140,11 @@
             width: 60px;
         }
 
-        .name-cell {
-            font-weight: 500;
-            color: #111;
-        }
+        .name-cell { font-weight: 500; color: #111; }
 
         .desc-cell {
             color: #6b7280;
-            max-width: 280px;
+            max-width: 260px;
             overflow: hidden;
             text-overflow: ellipsis;
             white-space: nowrap;
@@ -174,32 +174,31 @@
             border-radius: 50%;
         }
 
-        .status-completed {
-            background: #ecfdf5;
-            color: #059669;
-        }
+        .status-completed { background: #ecfdf5; color: #059669; }
         .status-completed::before { background: #10b981; }
 
-        .status-pending {
-            background: #fff7ed;
-            color: #c2410c;
-        }
+        .status-pending { background: #fff7ed; color: #c2410c; }
         .status-pending::before { background: #f97316; }
 
-        .link-edit {
-            color: #6366f1;
+        .actions-cell {
+            text-align: right;
+            white-space: nowrap;
+        }
+
+        .link-edit, .link-delete {
             font-size: 13px;
             font-weight: 500;
             text-decoration: none;
             padding: 6px 12px;
             border-radius: 8px;
             transition: background 0.12s ease;
-            white-space: nowrap;
         }
 
-        .link-edit:hover {
-            background: #eef2ff;
-        }
+        .link-edit { color: #6366f1; }
+        .link-edit:hover { background: #eef2ff; }
+
+        .link-delete { color: #dc2626; }
+        .link-delete:hover { background: #fef2f2; }
 
         .empty {
             padding: 64px 24px;
@@ -208,11 +207,7 @@
             font-size: 15px;
         }
 
-        .empty span {
-            display: block;
-            font-size: 40px;
-            margin-bottom: 12px;
-        }
+        .empty span { display: block; font-size: 40px; margin-bottom: 12px; }
     </style>
 </head>
 <body>
@@ -228,6 +223,17 @@
             <a th:href="@{/task/new}" class="btn btn-primary">+ Новая задача</a>
         </div>
     </div>
+
+    <!-- Форма фильтрации -->
+    <form action="/tasks/filter" method="get" class="filter-form">
+        <label for="completed">Показать:</label>
+        <select name="completed" id="completed">
+            <option value="true">Только выполненные</option>
+            <option value="false">Только невыполненные</option>
+        </select>
+        <button type="submit" class="btn btn-primary">Фильтровать</button>
+        <a th:href="@{/tasks}" class="btn btn-ghost">Сбросить</a>
+    </form>
 
     <div class="card">
         <table>
@@ -251,8 +257,11 @@
                     <span th:if="${task.completed}" class="status status-completed">Выполнено</span>
                     <span th:unless="${task.completed}" class="status status-pending">В процессе</span>
                 </td>
-                <td style="text-align: right;">
-                    <a th:href="@{/task/edit/{id}(id=${task.id})}" class="link-edit">Редактировать</a>
+                <td class="actions-cell">
+                    <a th:href="@{/task/edit/{id}(id=${task.id})}" class="link-edit">Изменить</a>
+                    <a th:href="@{/task/delete/{id}(id=${task.id})}"
+                       class="link-delete"
+                       onclick="return confirm('Удалить задачу?')">Удалить</a>
                 </td>
             </tr>
 

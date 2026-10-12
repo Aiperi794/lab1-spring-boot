@@ -44,9 +44,7 @@
             margin-bottom: 32px;
         }
 
-        .field {
-            margin-bottom: 20px;
-        }
+        .field { margin-bottom: 20px; }
 
         label {
             display: block;
@@ -83,10 +81,7 @@
             color: #9ca3af;
         }
 
-        textarea {
-            resize: vertical;
-            min-height: 88px;
-        }
+        textarea { resize: vertical; min-height: 88px; }
 
         .checkbox-row {
             display: flex;
@@ -143,7 +138,6 @@
             background: #111;
             color: #fff;
         }
-
         .btn-primary:hover {
             background: #000;
             transform: translateY(-1px);
@@ -154,7 +148,6 @@
             color: #6b7280;
             border: 1px solid #e5e7eb;
         }
-
         .btn-ghost:hover {
             color: #111;
             border-color: #111;
@@ -166,9 +159,7 @@
     <h1 th:text="${task.id != null} ? 'Редактировать задачу' : 'Новая задача'">
         Новая задача
     </h1>
-    <p class="subtitle">
-        Заполните поля и сохраните изменения
-    </p>
+    <p class="subtitle">Заполните поля и сохраните изменения</p>
 
     <form th:action="@{/task/save}" th:object="${task}" method="post">
         <input type="hidden" th:field="*{id}" />
@@ -185,7 +176,10 @@
 
         <div class="field">
             <label for="dueDate">Срок выполнения</label>
-            <input type="date" id="dueDate" th:field="*{dueDate}" />
+            <input type="date"
+                   id="dueDate"
+                   name="dueDate"
+                   th:value="${task.dueDate != null ? #temporals.format(task.dueDate, 'yyyy-MM-dd') : ''}" />
         </div>
 
         <div class="field">
