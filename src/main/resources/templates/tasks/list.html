@@ -19,7 +19,7 @@
             -webkit-font-smoothing: antialiased;
         }
 
-        .container { max-width: 1000px; margin: 0 auto; }
+        .container { max-width: 1100px; margin: 0 auto; }
 
         .header {
             display: flex;
@@ -69,36 +69,80 @@
         }
         .btn-ghost:hover { color: #111; border-color: #111; }
 
-        .filter-form {
-            display: flex;
-            gap: 10px;
-            align-items: center;
+        .btn-small {
+            padding: 8px 16px;
+            font-size: 13px;
+        }
+
+        /* Форма фильтрации */
+        .filter-card {
             background: #fff;
-            padding: 16px 20px;
             border: 1px solid #ececec;
             border-radius: 12px;
+            padding: 20px 24px;
             margin-bottom: 20px;
+        }
+
+        .filter-title {
+            font-size: 13px;
+            font-weight: 600;
+            color: #6b7280;
+            text-transform: uppercase;
+            letter-spacing: 0.06em;
+            margin-bottom: 14px;
+        }
+
+        .filter-form {
+            display: flex;
+            gap: 12px;
+            align-items: flex-end;
             flex-wrap: wrap;
         }
 
-        .filter-form label {
-            font-size: 14px;
+        .filter-field {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+
+        .filter-field label {
+            font-size: 12px;
             color: #6b7280;
             font-weight: 500;
         }
 
-        .filter-form select {
+        .filter-field select,
+        .filter-field input {
             font-family: inherit;
             font-size: 14px;
             padding: 8px 12px;
             border: 1px solid #e5e7eb;
             border-radius: 8px;
             background: #fff;
-            cursor: pointer;
             outline: none;
+            transition: border-color 0.15s ease;
         }
 
-        .filter-form select:focus { border-color: #6366f1; }
+        .filter-field select:focus,
+        .filter-field input:focus {
+            border-color: #6366f1;
+        }
+
+        .filter-actions {
+            display: flex;
+            gap: 8px;
+        }
+
+        /* Информация о фильтре */
+        .filter-info {
+            background: #eef2ff;
+            color: #4f46e5;
+            padding: 10px 16px;
+            border-radius: 10px;
+            font-size: 13.5px;
+            font-weight: 500;
+            margin-bottom: 16px;
+        }
 
         .card {
             background: #fff;
@@ -224,17 +268,43 @@
         </div>
     </div>
 
-    <!-- Форма фильтрации -->
-    <form action="/tasks/filter" method="get" class="filter-form">
-        <label for="completed">Показать:</label>
-        <select name="completed" id="completed">
-            <option value="true">Только выполненные</option>
-            <option value="false">Только невыполненные</option>
-        </select>
-        <button type="submit" class="btn btn-primary">Фильтровать</button>
-        <a th:href="@{/tasks}" class="btn btn-ghost">Сбросить</a>
-    </form>
+    <!-- ФОРМА ФИЛЬТРАЦИИ -->
+    <div class="filter-card">
+        <div class="filter-title">Фильтрация</div>
+        <form action="/tasks/filter-full" method="get" class="filter-form">
 
+            <div class="filter-field">
+                <label for="completed">Статус</label>
+                <select name="completed" id="completed">
+                    <option value="">Все</option>
+                    <option value="true">Выполненные</option>
+                    <option value="false">Невыполненные</option>
+                </select>
+            </div>
+
+            <div class="filter-field">
+                <label for="startDate">Дата с</label>
+                <input type="date" name="startDate" id="startDate" />
+            </div>
+
+            <div class="filter-field">
+                <label for="endDate">Дата по</label>
+                <input type="date" name="endDate" id="endDate" />
+            </div>
+
+            <div class="filter-actions">
+                <button type="submit" class="btn btn-primary btn-small">Применить</button>
+                <a th:href="@{/tasks}" class="btn btn-ghost btn-small">Сбросить</a>
+            </div>
+        </form>
+    </div>
+
+    <!-- Информация о текущем фильтре -->
+    <div th:if="${filterInfo}" class="filter-info" th:text="${filterInfo}">
+        Показаны отфильтрованные задачи
+    </div>
+
+    <!-- ТАБЛИЦА ЗАДАЧ -->
     <div class="card">
         <table>
             <thead>
@@ -267,8 +337,8 @@
 
             <tr th:if="${#lists.isEmpty(tasks)}">
                 <td colspan="6" class="empty">
-                    <span>📋</span>
-                    Задач пока нет. Создайте первую!
+                    <span>🔍</span>
+                    По вашему запросу ничего не найдено.
                 </td>
             </tr>
             </tbody>

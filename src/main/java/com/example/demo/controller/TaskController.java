@@ -3,11 +3,13 @@ package com.example.demo.controller;
 import com.example.demo.model.TaskModel;
 import com.example.demo.service.TaskService;
 import jakarta.validation.Valid;
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 
+import java.time.LocalDate;
 import java.util.List;
 
 @Controller
@@ -47,7 +49,6 @@ public class TaskController {
             @Valid @ModelAttribute("task") TaskModel task,
             BindingResult bindingResult) {
 
-        // Если есть ошибки валидации — возвращаемся на форму
         if (bindingResult.hasErrors()) {
             return "tasks/form";
         }
@@ -63,10 +64,60 @@ public class TaskController {
         return "redirect:/tasks";
     }
 
+    // ========== Фильтрация ==========
+
     /** Фильтрация по статусу */
     @GetMapping("/tasks/filter")
-    public String filterTasks(@RequestParam("completed") boolean isCompleted, Model model) {
+    public String filterByStatus(@RequestParam("completed") boolean isCompleted, Model model) {
         List<TaskModel> filteredTasks = taskService.findByCompleted(isCompleted);
+        model.addAttribute("tasks", filteredTasks);
+        model.addAttribute("filterInfo",
+                isCompleted ? "Показаны только выполненные задачи" : "Показаны только невыполненные задачи");
+        return "tasks/list";
+    }
+
+    /** Фильтрация по диапазону дат */
+    @GetMapping("/tasks/filter-by-date")
+    public String filterByDate(
+            @RequestParam("startDate") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate startDate,
+            @RequestParam("endDate") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate endDate,
+            Model model) {
+
+        List<TaskModel> filteredTasks = taskService.findByDateRange(startDate, endDate);
+        model.addAttribute("tasks", filteredTasks);
+        model.addAttribute("filterInfo",
+                "Показаны задачи с " + startDate + " по " + endDate);
+        return "tasks/list";
+    }
+
+    /** Фильтрация по статусу И диапазону дат */
+    @GetMapping("/tasks/filter-full")
+    public String filterFull(
+            @RequestParam(value = "completed", required = false) Boolean isCompleted,
+            @RequestParam(value = "startDate", required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate startDate,
+            @RequestParam(value = "endDate", required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate endDate,
+            Model model) {
+
+        List<TaskModel> filteredTasks;
+
+        if (isCompleted != null && startDate != null && endDate != null) {
+            filteredTasks = taskService.findByCompletedAndDateRange(isCompleted, startDate, endDate);
+            model.addAttribute("filterInfo",
+                    "Показаны задачи: " + (isCompleted ? "выполненные" : "невыполненные")
+                            + " с " + startDate + " по " + endDate);
+        } else if (isCompleted != null) {
+            filteredTasks = taskService.findByCompleted(isCompleted);
+            model.addAttribute("filterInfo",
+                    isCompleted ? "Показаны только выполненные" : "Показаны только невыполненные");
+        } else if (startDate != null && endDate != null) {
+            filteredTasks = taskService.findByDateRange(startDate, endDate);
+            model.addAttribute("filterInfo",
+                    "Показаны задачи с " + startDate + " по " + endDate);
+        } else {
+            filteredTasks = taskService.findAll();
+            model.addAttribute("filterInfo", "Показаны все задачи");
+        }
+
         model.addAttribute("tasks", filteredTasks);
         return "tasks/list";
     }

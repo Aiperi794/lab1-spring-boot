@@ -5,6 +5,7 @@ import com.example.demo.model.TaskModel;
 import com.example.demo.repository.TaskRepository;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDate;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -49,7 +50,6 @@ public class TaskService {
 
     // ========== CRUD ==========
 
-    /** Получить все задачи */
     public List<TaskModel> findAll() {
         return taskRepository.findAll()
                 .stream()
@@ -57,28 +57,43 @@ public class TaskService {
                 .collect(Collectors.toList());
     }
 
-    /** Получить одну задачу по ID */
     public TaskModel findById(Long id) {
         return taskRepository.findById(id)
                 .map(this::convertToModel)
                 .orElse(null);
     }
 
-    /** Сохранить задачу (создание или обновление) */
     public TaskModel save(TaskModel model) {
         Task entity = convertToEntity(model);
         Task saved = taskRepository.save(entity);
         return convertToModel(saved);
     }
 
-    /** Удалить задачу по ID */
     public void deleteById(Long id) {
         taskRepository.deleteById(id);
     }
 
-    /** Фильтрация: только выполненные / только невыполненные */
+    // ========== Фильтрация ==========
+
+    /** Фильтрация по статусу */
     public List<TaskModel> findByCompleted(boolean isCompleted) {
         return taskRepository.findAllByCompleted(isCompleted)
+                .stream()
+                .map(this::convertToModel)
+                .collect(Collectors.toList());
+    }
+
+    /** Фильтрация по диапазону дат */
+    public List<TaskModel> findByDateRange(LocalDate startDate, LocalDate endDate) {
+        return taskRepository.findAllByDueDateBetween(startDate, endDate)
+                .stream()
+                .map(this::convertToModel)
+                .collect(Collectors.toList());
+    }
+
+    /** Фильтрация по статусу И диапазону дат */
+    public List<TaskModel> findByCompletedAndDateRange(boolean isCompleted, LocalDate startDate, LocalDate endDate) {
+        return taskRepository.findAllByCompletedAndDueDateBetween(isCompleted, startDate, endDate)
                 .stream()
                 .map(this::convertToModel)
                 .collect(Collectors.toList());
