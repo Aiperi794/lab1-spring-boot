@@ -76,9 +76,23 @@
             box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.1);
         }
 
-        input::placeholder,
-        textarea::placeholder {
-            color: #9ca3af;
+        /* Поле с ошибкой — красная рамка */
+        input.has-error,
+        textarea.has-error {
+            border-color: #dc2626;
+        }
+        input.has-error:focus,
+        textarea.has-error:focus {
+            box-shadow: 0 0 0 3px rgba(220, 38, 38, 0.1);
+        }
+
+        /* Сообщение об ошибке */
+        .error-message {
+            display: block;
+            color: #dc2626;
+            font-size: 12.5px;
+            margin-top: 6px;
+            font-weight: 500;
         }
 
         textarea { resize: vertical; min-height: 88px; }
@@ -105,11 +119,6 @@
             height: 18px;
             accent-color: #6366f1;
             cursor: pointer;
-        }
-
-        .checkbox-row span {
-            font-size: 14.5px;
-            color: #374151;
         }
 
         .actions {
@@ -165,13 +174,26 @@
         <input type="hidden" th:field="*{id}" />
 
         <div class="field">
-            <label for="name">Название</label>
-            <input type="text" id="name" th:field="*{name}" placeholder="Например, сделать отчёт" />
+            <label for="name">Название *</label>
+            <input type="text"
+                   id="name"
+                   th:field="*{name}"
+                   th:classappend="${#fields.hasErrors('name')} ? 'has-error' : ''"
+                   placeholder="Например, сделать отчёт" />
+            <span class="error-message"
+                  th:if="${#fields.hasErrors('name')}"
+                  th:errors="*{name}">Ошибка</span>
         </div>
 
         <div class="field">
             <label for="description">Описание</label>
-            <textarea id="description" th:field="*{description}" placeholder="Кратко опишите задачу"></textarea>
+            <textarea id="description"
+                      th:field="*{description}"
+                      th:classappend="${#fields.hasErrors('description')} ? 'has-error' : ''"
+                      placeholder="Кратко опишите задачу"></textarea>
+            <span class="error-message"
+                  th:if="${#fields.hasErrors('description')}"
+                  th:errors="*{description}">Ошибка</span>
         </div>
 
         <div class="field">

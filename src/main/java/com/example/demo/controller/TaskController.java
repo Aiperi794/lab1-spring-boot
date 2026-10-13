@@ -2,8 +2,10 @@ package com.example.demo.controller;
 
 import com.example.demo.model.TaskModel;
 import com.example.demo.service.TaskService;
+import jakarta.validation.Valid;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -39,9 +41,17 @@ public class TaskController {
         return "tasks/form";
     }
 
-    /** Сохранение (создание или обновление) */
+    /** Сохранение с валидацией */
     @PostMapping("/task/save")
-    public String saveTask(@ModelAttribute("task") TaskModel task) {
+    public String saveTask(
+            @Valid @ModelAttribute("task") TaskModel task,
+            BindingResult bindingResult) {
+
+        // Если есть ошибки валидации — возвращаемся на форму
+        if (bindingResult.hasErrors()) {
+            return "tasks/form";
+        }
+
         taskService.save(task);
         return "redirect:/tasks";
     }
